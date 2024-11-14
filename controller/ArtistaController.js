@@ -23,7 +23,7 @@ const ArtistaController = {
     async listarArtistas(req, res) {
         try {
             const artistas = await Artista.findAll({
-                include: [{ model: Disco, as: 'discos' }]
+                include: [{ model: Disco, as: 'discos' }],
             });
             res.status(200).json(artistas);
         } catch (error) {

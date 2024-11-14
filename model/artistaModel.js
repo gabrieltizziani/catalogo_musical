@@ -17,9 +17,18 @@ module.exports = (sequelize, DataTypes) => {
 
     // Unificando as associações dentro de uma única função
     Artista.associate = (models) => {
-        Artista.belongsToMany(models.Disco, { through: 'ArtistaDiscos', foreignKey: 'artistaId' });
-        Artista.belongsTo(models.Genero, { foreignKey: 'generoId', as: 'genero' });
+        Artista.belongsToMany(models.Disco, { 
+            through: 'ArtistaDiscos', 
+            foreignKey: 'artistaId', 
+            as: 'discos',  // Definindo o alias como 'discos'
+            timestamps: false
+        });
+        Artista.belongsTo(models.Genero, { 
+            foreignKey: 'generoId', 
+            as: 'genero' 
+        });
     };
+    
 
     return Artista;
 };

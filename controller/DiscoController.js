@@ -1,38 +1,67 @@
 const { Disco, Artista, Genero, Faixa } = require('../model');
+const { Op } = require('sequelize');
 
 const DiscoController = {
-    async cadastrarDisco(req, res) {
-        try {
-            const { titulo, anoLancamento, capa, faixas, generoIds } = req.body;
-
-            // Cria o disco
-            const novoDisco = await Disco.create({ titulo, anoLancamento, capa });
-
-            // Associa gêneros ao disco
-            if (generoIds && generoIds.length > 0) {
-                const generos = await Genero.findAll({ where: { id: generoIds } });
-                await novoDisco.addGeneros(generos);
-            }
-
-            // Cria e associa faixas ao disco, se fornecidas
-            if (faixas && faixas.length > 0) {
-                for (const faixa of faixas) {
-                    await Faixa.create({ ...faixa, discoId: novoDisco.id });
-                }
-            }
-
-            res.status(201).json(novoDisco);
-        } catch (error) {
-            res.status(500).json({ error: 'Erro ao cadastrar disco', message: error.message });
+// Controller de Disco
+async cadastrarDisco(req, res) {
+    try {
+        const { titulo, anoLancamento, capa, faixas, generoIds, artistaIds } = req.body;
+    
+        // Cria o disco
+        const novoDisco = await Disco.create({ titulo, anoLancamento, capa });
+    
+        // Associa artistas ao disco
+        if (artistaIds && artistaIds.length > 0) {
+            const artistas = await Artista.findAll({ where: { id: artistaIds } });
+            await novoDisco.addArtistas(artistas);  // Adiciona os artistas ao disco
         }
-    },
+    
+        // Associa gêneros ao disco
+        if (generoIds && generoIds.length > 0) {
+            const generos = await Genero.findAll({ where: { id: generoIds } });
+            await novoDisco.addGeneros(generos);
+        }
+    
+        // Cria e associa faixas ao disco, se fornecidas
+        if (faixas && faixas.length > 0) {
+            for (const faixa of faixas) {
+                if (!faixa.titulo || !faixa.duracao) {
+                    return res.status(400).json({
+                        error: 'Erro ao cadastrar disco',
+                        message: 'Cada faixa deve conter um título e duração'
+                    });
+                }
+                await Faixa.create({
+                    titulo: faixa.titulo,
+                    duracao: faixa.duracao,
+                    numeroFaixa: faixa.numeroFaixa,
+                    discoId: novoDisco.id
+                });
+            }
+        }
+    
+        // Recupera o disco com faixas, gêneros e artistas associados
+        const discoComAssociacoes = await Disco.findByPk(novoDisco.id, {
+            include: [
+                { model: Genero, as: 'Generos' },
+                { model: Faixa, as: 'faixas' },
+                { model: Artista, as: 'artistas' }  // Inclui artistas associados ao disco
+            ]
+        });
+    
+        res.status(201).json(discoComAssociacoes);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao cadastrar disco', message: error.message });
+    }
+},
+
 
     async listarDiscos(req, res) {
         try {
             const discos = await Disco.findAll({
                 include: [
                     { model: Artista, as: 'artistas' },
-                    { model: Genero, as: 'generos' },
+                    { model: Genero, as: 'Generos' },
                     { model: Faixa, as: 'faixas' }
                 ]
             });
@@ -62,10 +91,11 @@ const DiscoController = {
                     },
                     {
                         model: Genero,
-                        as: 'generos',
+                        as: 'Generos',
                         where: genero ? { nome: { [Op.like]: `%${genero}%` } } : undefined,
                         required: !!genero
-                    }
+                    },
+                    { model: Faixa, as: 'faixas' }
                 ]
             });
 
@@ -93,7 +123,16 @@ const DiscoController = {
                 await disco.setGeneros(generos);
             }
 
-            res.status(200).json(disco);
+            // Recupera o disco atualizado com todas as associações
+            const discoAtualizado = await Disco.findByPk(id, {
+                include: [
+                    { model: Artista, as: 'artistas' },
+                    { model: Genero, as: 'Generos' },
+                    { model: Faixa, as: 'faixas' }
+                ]
+            });
+
+            res.status(200).json(discoAtualizado);
         } catch (error) {
             res.status(500).json({ error: 'Erro ao editar disco', message: error.message });
         }
