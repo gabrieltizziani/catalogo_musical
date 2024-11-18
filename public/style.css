@@ -1,0 +1,92 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Corpo */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Título */
+h1 {
+    font-size: 36px;
+    margin-bottom: 40px;
+    color: #333;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* Navegação */
+nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    list-style: none;
+}
+
+/* Link de navegação */
+nav a {
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007BFF;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 200px;
+    height: 200px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+nav a:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 4px q15px rgba(0, 0, 0, 0.2);
+}
+
+/* Adicionando as imagens */
+nav a::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Imagens específicas para cada link */
+nav a[href='/cadastrar/disco']::before {
+    background-image: url('/images/disco.png');
+}
+
+nav a[href='/cadastrar/artista']::before {
+    background-image: url('https://example.com/imagem-artista.png'); /* Substitua pelo link da imagem */
+}
+
+nav a[href='/cadastrar/genero']::before {
+    background-image: url('https://example.com/imagem-genero.png'); /* Substitua pelo link da imagem */
+}
+
+/* Estilo para o hover */
+nav a:hover::before {
+    opacity: 0.8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        gap: 20px;
+    }
+}

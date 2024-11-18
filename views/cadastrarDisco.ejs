@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Disco</title>
+</head>
+<body>
+
+    <h1>Cadastro de Disco</h1>
+
+    <!-- Formulário de cadastro -->
+    <form action="/cadastrar/disco" method="POST">
+        <label for="nome">Nome do Disco:</label>
+        <input type="text" id="nome" name="nome" required>
+        <br>
+        <label for="artista">Artista:</label>
+        <input type="text" id="artista" name="artista" required>
+        <br>
+        <label for="genero">Gênero:</label>
+        <input type="text" id="genero" name="genero" required>
+        <br>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Discos Cadastrados</h2>
+
+    <!-- Lista de discos -->
+    <ul>
+        <% discos.forEach(disco => { %>
+            <li><%= disco.nome %> - <%= disco.artista %> - <%= disco.genero %></li>
+        <% }) %>
+    </ul>
+
+</body>
+</html>

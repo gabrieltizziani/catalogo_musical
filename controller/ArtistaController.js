@@ -25,11 +25,15 @@ const ArtistaController = {
             const artistas = await Artista.findAll({
                 include: [{ model: Disco, as: 'discos' }],
             });
-            res.status(200).json(artistas);
+            res.render('artistas/listar', {
+                title: 'Lista de Artistas',
+                artistas,
+            });
         } catch (error) {
             res.status(500).json({ error: 'Erro ao listar artistas', message: error.message });
         }
     },
+    
 
     async editarArtista(req, res) {
         try {
