@@ -22,7 +22,7 @@
         <label for="discoIds">Discos:</label>
         <select name="discoIds[]" id="discoIds" multiple>
             <% discos.forEach(disco => { %>
-                <option value="<%= disco.id %>"><%= disco.nome %></option>
+                <option value="<%= disco.id %>"><%= disco.titulo %></option> <!-- Corrigi para disco.titulo -->
             <% }) %>
         </select>
     

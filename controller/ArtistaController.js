@@ -83,6 +83,7 @@ const ArtistaController = {
             res.status(500).json({ error: 'Erro ao buscar artista', message: error.message });
         }
     },
+
 };
 
 module.exports = ArtistaController;

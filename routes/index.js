@@ -15,14 +15,22 @@ router.get('/cadastrar/disco', (req, res) => {
     res.render('cadastrarDisco');
 });
 
-router.get('/cadastrar/artista', (req, res) => {
-    res.render('cadastrarArtista');
-});
 
 router.get('/cadastrar/genero', (req, res) => {
     res.render('cadastrarGenero');
 });
 
+router.get('/cadastrar/artista', async (req, res) => {
+    try {
+        const generos = await Genero.findAll();  // Obtendo gêneros para o select
+        const discos = await Disco.findAll();  // Obtendo discos para o select
+        const artistas = await Artista.findAll({ include: ['genero', 'discos'] }); // Para listar os artistas existentes
+
+        res.render('cadastrarArtista', { generos, discos, artistas }); // Passando os dados para a view
+    } catch (error) {
+        res.status(500).send('Erro ao carregar a página de cadastro');
+    }
+});
 
 // Usando as rotas
 router.use('/api', artistaRoutes);

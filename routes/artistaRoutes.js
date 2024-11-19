@@ -9,4 +9,5 @@ router.get('/artistas/:id', ArtistaController.buscarArtistaPorId);
 router.put('/artistas/:id', ArtistaController.editarArtista);  // Editar um artista
 router.delete('/artistas/:id', ArtistaController.excluirArtista);  // Excluir um artista
 
+
 module.exports = router;

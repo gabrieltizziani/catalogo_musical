@@ -7,6 +7,8 @@ const routes = require('./routes');  // Importando as rotas
 app.set('view engine', 'ejs');
 app.set('views', './views'); // Define o diretório onde as views estarão
 
+
+
 // Middlewares
 app.use(bodyParser.json());  // Para ler dados JSON no corpo da requisição
 
@@ -19,6 +21,8 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.render('index'); // Renderiza a página inicial
 });
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Definindo a porta
 const PORT = process.env.PORT || 3000;
