@@ -37,6 +37,22 @@ const GeneroController = {
         }
     },
 
+    async buscarGeneroPorId(req, res) {
+        try {
+            const { id } = req.params;
+
+            // Busca o gênero pelo ID
+            const genero = await Genero.findByPk(id);
+            if (!genero) {
+                return res.status(404).json({ error: 'Gênero não encontrado' });
+            }
+
+            res.status(200).json(genero);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao buscar gênero', message: error.message });
+        }
+    },
+
     async excluirGenero(req, res) {
         try {
             const { id } = req.params;

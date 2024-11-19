@@ -4,7 +4,8 @@ const ArtistaController = require('../controller/ArtistaController');
 
 // Rotas para o Artista
 router.post('/artistas', ArtistaController.cadastrarArtista);  // Cadastrar um novo artista
-router.get('/artistas', ArtistaController.listarArtistas);    // Listar todos os artistas
+router.get('/artistas', ArtistaController.listarArtistas);  // Listar todos os artistas
+router.get('/artistas/:id', ArtistaController.buscarArtistaPorId);
 router.put('/artistas/:id', ArtistaController.editarArtista);  // Editar um artista
 router.delete('/artistas/:id', ArtistaController.excluirArtista);  // Excluir um artista
 

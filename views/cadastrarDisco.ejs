@@ -1,36 +1,63 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Disco</title>
+    <link rel="stylesheet" href="/style.css">
+    <title>Cadastrar Disco</title>
 </head>
 <body>
-
-    <h1>Cadastro de Disco</h1>
-
-    <!-- Formulário de cadastro -->
+    <h1>Cadastrar Disco</h1>
     <form action="/cadastrar/disco" method="POST">
-        <label for="nome">Nome do Disco:</label>
-        <input type="text" id="nome" name="nome" required>
-        <br>
-        <label for="artista">Artista:</label>
-        <input type="text" id="artista" name="artista" required>
-        <br>
-        <label for="genero">Gênero:</label>
-        <input type="text" id="genero" name="genero" required>
-        <br>
-        <button type="submit">Cadastrar</button>
+        <label for="titulo">Título do Disco:</label>
+        <input type="text" id="titulo" name="titulo" required>
+
+        <label for="anoLancamento">Ano de Lançamento:</label>
+        <input type="number" id="anoLancamento" name="anoLancamento" required>
+
+        <label for="capa">Capa (URL):</label>
+        <input type="text" id="capa" name="capa" required>
+
+        <label for="faixas">Faixas:</label>
+        <div id="faixas">
+            <div class="faixa">
+                <input type="text" name="faixas[0][titulo]" placeholder="Título da Faixa" required>
+                <input type="text" name="faixas[0][duracao]" placeholder="Duração da Faixa" required>
+                <input type="number" name="faixas[0][numeroFaixa]" placeholder="Número da Faixa" required>
+            </div>
+        </div>
+        <button type="button" id="adicionarFaixa">Adicionar Faixa</button>
+
+        <label for="generoIds">Gêneros:</label>
+        <select name="generoIds[]" id="generoIds" multiple>
+            <% generos.forEach(genero => { %>
+                <option value="<%= genero.id %>"><%= genero.nome %></option>
+            <% }) %>
+        </select>
+
+        <label for="artistaIds">Artistas:</label>
+        <select name="artistaIds[]" id="artistaIds" multiple>
+            <% artistas.forEach(artista => { %>
+                <option value="<%= artista.id %>"><%= artista.nomeArtista %></option>
+            <% }) %>
+        </select>
+
+        <button type="submit">Cadastrar Disco</button>
     </form>
 
-    <h2>Discos Cadastrados</h2>
-
-    <!-- Lista de discos -->
-    <ul>
-        <% discos.forEach(disco => { %>
-            <li><%= disco.nome %> - <%= disco.artista %> - <%= disco.genero %></li>
-        <% }) %>
-    </ul>
-
+    <script>
+        let faixaCount = 1;
+        document.getElementById('adicionarFaixa').addEventListener('click', () => {
+            const faixaDiv = document.createElement('div');
+            faixaDiv.classList.add('faixa');
+            faixaDiv.innerHTML = `
+                <input type="text" name="faixas[${faixaCount}][titulo]" placeholder="Título da Faixa" required>
+                <input type="text" name="faixas[${faixaCount}][duracao]" placeholder="Duração da Faixa" required>
+                <input type="number" name="faixas[${faixaCount}][numeroFaixa]" placeholder="Número da Faixa" required>
+            `;
+            document.getElementById('faixas').appendChild(faixaDiv);
+            faixaCount++;
+        });
+    </script>
 </body>
 </html>

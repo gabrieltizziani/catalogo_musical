@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <title>Cadastrar Artista</title>
+</head>
+<body>
+    <h1>Cadastrar Artista</h1>
+    <form action="/api/artistas" method="POST">
+        <label for="nomeArtista">Nome do Artista:</label>
+        <input type="text" name="nomeArtista" id="nomeArtista" required>
+    
+        <label for="generoId">Gênero:</label>
+        <select name="generoId" id="generoId" required>
+            <% generos.forEach(genero => { %>
+                <option value="<%= genero.id %>"><%= genero.nome %></option>
+            <% }) %>
+        </select>
+    
+        <label for="discoIds">Discos:</label>
+        <select name="discoIds[]" id="discoIds" multiple>
+            <% discos.forEach(disco => { %>
+                <option value="<%= disco.id %>"><%= disco.nome %></option>
+            <% }) %>
+        </select>
+    
+        <button type="submit">Cadastrar Artista</button>
+    </form>
+    <h2>Lista de Artistas</h2>
+    <ul>
+        <% artistas.forEach(artista => { %>
+            <li>
+                <strong><%= artista.nomeArtista %></strong><br>
+                Gênero: <%= artista.genero.nome %><br>
+                Discos:
+                <ul>
+                    <% artista.discos.forEach(disco => { %>
+                        <li><%= disco.nome %></li>
+                    <% }) %>
+                </ul>
+            </li>
+        <% }) %>
+    </ul>
+</body>
+</html>

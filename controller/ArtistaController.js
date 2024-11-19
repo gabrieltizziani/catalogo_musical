@@ -23,18 +23,16 @@ const ArtistaController = {
     async listarArtistas(req, res) {
         try {
             const artistas = await Artista.findAll({
-                include: [{ model: Disco, as: 'discos' }],
+                include: [{ model: Disco, as: 'discos' }],  // Inclui discos associados
             });
-            res.render('artistas/listar', {
-                title: 'Lista de Artistas',
-                artistas,
-            });
+
+            // Retorna os dados dos artistas no formato JSON
+            res.status(200).json(artistas);
         } catch (error) {
             res.status(500).json({ error: 'Erro ao listar artistas', message: error.message });
         }
     },
     
-
     async editarArtista(req, res) {
         try {
             const { id } = req.params;
@@ -65,7 +63,26 @@ const ArtistaController = {
         } catch (error) {
             res.status(500).json({ error: 'Erro ao excluir artista', message: error.message });
         }
-    }
+    },
+
+    async buscarArtistaPorId(req, res) {
+        try {
+            const { id } = req.params;  // Obtém o ID da URL
+            const artista = await Artista.findByPk(id, {
+                include: [{ model: Disco, as: 'discos' }],  // Inclui discos associados
+            });
+
+            // Se o artista não for encontrado, retorna um erro 404
+            if (!artista) {
+                return res.status(404).json({ error: 'Artista não encontrado' });
+            }
+
+            // Retorna o artista encontrado
+            res.status(200).json(artista);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao buscar artista', message: error.message });
+        }
+    },
 };
 
 module.exports = ArtistaController;

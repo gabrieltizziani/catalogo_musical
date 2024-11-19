@@ -151,7 +151,29 @@ async cadastrarDisco(req, res) {
         } catch (error) {
             res.status(500).json({ error: 'Erro ao excluir disco', message: error.message });
         }
-    }
+    },
+    async buscarDiscoPorId(req, res) {
+        try {
+            const { id } = req.params;  // Obtém o ID da URL
+            const disco = await Disco.findByPk(id, {
+                include: [
+                    { model: Artista, as: 'artistas' },   // Inclui artistas associados ao disco
+                    { model: Genero, as: 'Generos' },      // Inclui gêneros associados ao disco
+                    { model: Faixa, as: 'faixas' }         // Inclui faixas associadas ao disco
+                ]
+            });
+
+            // Se o disco não for encontrado, retorna um erro 404
+            if (!disco) {
+                return res.status(404).json({ error: 'Disco não encontrado' });
+            }
+
+            // Retorna o disco encontrado com todas as associações
+            res.status(200).json(disco);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao buscar disco', message: error.message });
+        }
+    },
 };
 
 module.exports = DiscoController;
