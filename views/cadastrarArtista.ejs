@@ -3,45 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Musical</title>
     <link rel="stylesheet" href="/style.css">
-    <title>Cadastrar Artista</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <h1>Cadastrar Artista</h1>
-    <form action="/api/artistas" method="POST">
-        <label for="nomeArtista">Nome do Artista:</label>
-        <input type="text" name="nomeArtista" id="nomeArtista" required>
+    <h1>Catálogo Musical</h1>
+
+    <!-- Formulário de Cadastro/Atualização -->
+    <section>
+        <h2>Cadastrar/Editar Artista</h2>
+        <form id="formArtista">
+            <input type="hidden" id="artistaId">
+        
+            <label for="nomeArtista">Nome do Artista:</label>
+            <input type="text" id="nomeArtista" placeholder="Nome do Artista" required>
+        
+            <label for="generoId">Gênero:</label>
+            <select id="generoId" required>
+                <option value="">Selecione um gênero</option>
+                <!-- Os gêneros serão carregados dinamicamente -->
+            </select>
+        
+            <label for="discoIds">Discos (IDs separados por vírgula):</label>
+            <input type="text" id="discoIds" placeholder="IDs dos Discos (opcional)">
+        
+            <button type="submit">Salvar</button>
+        </form>
+        
+        <ul id="listaArtistasUl"></ul> <!-- Alterado id para listaArtistasUl -->
+        <div id="detalhesArtista"></div>        
+    </section>
+
+    <!-- Lista de Artistas -->
+    <section>
+        <h2>Lista de Artistas</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Gênero</th>
+                    <th>Discos</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaArtistas"> <!-- Este tbody será preenchido com os artistas -->
+                <!-- Conteúdo dinâmico será inserido aqui -->
+            </tbody>
+        </table>
+    </section>
     
-        <label for="generoId">Gênero:</label>
-        <select name="generoId" id="generoId" required>
-            <% generos.forEach(genero => { %>
-                <option value="<%= genero.id %>"><%= genero.nome %></option>
-            <% }) %>
-        </select>
+    <script>
+        // Função para carregar gêneros
+        async function carregarGeneros() {
+            try {
+                const response = await axios.get('/api/generos'); // Rota para buscar gêneros
+                const generos = response.data;
     
-        <label for="discoIds">Discos:</label>
-        <select name="discoIds[]" id="discoIds" multiple>
-            <% discos.forEach(disco => { %>
-                <option value="<%= disco.id %>"><%= disco.titulo %></option> <!-- Corrigi para disco.titulo -->
-            <% }) %>
-        </select>
+                // Popula o select com os gêneros
+                const selectGenero = document.getElementById('generoId');
+                generos.forEach(genero => {
+                    const option = document.createElement('option');
+                    option.value = genero.id;
+                    option.textContent = genero.nome; // Ajuste conforme o nome do campo
+                    selectGenero.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar gêneros:', error);
+            }
+        }
     
-        <button type="submit">Cadastrar Artista</button>
-    </form>
-    <h2>Lista de Artistas</h2>
-    <ul>
-        <% artistas.forEach(artista => { %>
-            <li>
-                <strong><%= artista.nomeArtista %></strong><br>
-                Gênero: <%= artista.genero.nome %><br>
-                Discos:
-                <ul>
-                    <% artista.discos.forEach(disco => { %>
-                        <li><%= disco.nome %></li>
-                    <% }) %>
-                </ul>
-            </li>
-        <% }) %>
-    </ul>
+        // Função para carregar artistas
+// Função para carregar artistas
+async function carregarArtistas() {
+    try {
+        const response = await axios.get('/api/artistas');
+        const artistas = response.data;
+    
+        // Renderiza a lista de artistas na tabela
+        const lista = document.getElementById('listaArtistas');
+        lista.innerHTML = artistas.map(artista => `
+            <tr>
+                <td>${artista.id}</td>
+                <td>${artista.nomeArtista}</td>
+                <td>${artista.genero ? artista.genero.nome : 'Não informado'}</td>
+                <td>${artista.discos && artista.discos.length > 0 ? artista.discos.map(disco => disco.nome).join(', ') : 'Sem Discos'}</td>
+                <td>
+                    <button onclick="editarArtista(${artista.id})">Editar</button>
+                    <button onclick="excluirArtista(${artista.id})">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Erro ao carregar artistas:', error);
+    }
+}
+
+    
+        // Função para salvar artista
+        document.getElementById('formArtista').addEventListener('submit', async (e) => {
+            e.preventDefault();
+    
+            const id = document.getElementById('artistaId').value;
+            const nomeArtista = document.getElementById('nomeArtista').value;
+            const generoId = document.getElementById('generoId').value;
+            const discoIds = document.getElementById('discoIds').value
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id); // Remove valores vazios
+    
+            try {
+                if (id) {
+                    // Atualiza artista
+                    await axios.put(`/api/artistas/${id}`, { nomeArtista, generoId, discoIds });
+                } else {
+                    // Cria novo artista
+                    await axios.post('/api/artistas', { nomeArtista, generoId, discoIds });
+                }
+    
+                carregarArtistas();
+                document.getElementById('formArtista').reset();
+            } catch (error) {
+                console.error('Erro ao salvar artista:', error);
+            }
+        });
+    
+        // Função para editar artista
+        async function editarArtista(id) {
+            try {
+                const response = await axios.get(`/api/artistas/${id}`);
+                const artista = response.data;
+    
+                // Preenche o formulário
+                document.getElementById('artistaId').value = artista.id;
+                document.getElementById('nomeArtista').value = artista.nomeArtista;
+                document.getElementById('generoId').value = artista.generoId || '';
+                document.getElementById('discoIds').value = artista.discos
+                    ? artista.discos.map(disco => disco.id).join(', ')
+                    : '';
+            } catch (error) {
+                console.error('Erro ao carregar artista:', error);
+            }
+        }
+    
+        // Função para excluir artista
+        async function excluirArtista(id) {
+            try {
+                await axios.delete(`/api/artistas/${id}`);
+                carregarArtistas();
+            } catch (error) {
+                console.error('Erro ao excluir artista:', error);
+            }
+        }
+    
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarGeneros(); // Carrega gêneros ao carregar a página
+            carregarArtistas(); // Carrega artistas ao carregar a página
+        });
+    </script>
+    
 </body>
 </html>

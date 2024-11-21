@@ -5,88 +5,126 @@
     box-sizing: border-box;
 }
 
-/* Corpo */
+/* Cor de fundo */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
     color: #333;
-    text-align: center;
-    padding: 20px;
 }
 
 /* Título */
 h1 {
-    font-size: 36px;
-    margin-bottom: 40px;
-    color: #333;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-/* Navegação */
-nav ul {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    list-style: none;
-}
-
-/* Link de navegação */
-nav a {
-    display: block;
-    text-decoration: none;
-    color: #fff;
-    background-color: #007BFF;
-    padding: 20px;
-    border-radius: 8px;
     text-align: center;
-    width: 200px;
-    height: 200px;
-    transition: transform 0.3s, box-shadow 0.3s;
-    position: relative;
-    overflow: hidden;
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #1a1a1a;
 }
 
-nav a:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 4px q15px rgba(0, 0, 0, 0.2);
+/* Container principal */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Adicionando as imagens */
-nav a::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    background-size: cover;
-    background-position: center;
+/* Formulário de cadastro/edição */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
-/* Imagens específicas para cada link */
-nav a[href='/cadastrar/disco']::before {
-    background-image: url('/images/disco.png');
+form label {
+    font-weight: bold;
+    color: #555;
 }
 
-nav a[href='/cadastrar/artista']::before {
-    background-image: url('https://example.com/imagem-artista.png'); /* Substitua pelo link da imagem */
+form input, form select, form textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 400px;
 }
 
-nav a[href='/cadastrar/genero']::before {
-    background-image: url('https://example.com/imagem-genero.png'); /* Substitua pelo link da imagem */
+form input[type="submit"] {
+    background-color: #28a745;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
 }
 
-/* Estilo para o hover */
-nav a:hover::before {
-    opacity: 0.8;
+form input[type="submit"]:hover {
+    background-color: #218838;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    nav ul {
-        flex-direction: column;
-        gap: 20px;
-    }
+/* Lista de artistas */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
 }
+
+table th, table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+table td {
+    background-color: #f9f9f9;
+}
+
+/* Alinhamento de botões na tabela */
+table td .actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #c82333;
+}
+
+/* Detalhes do artista */
+#detalhesArtista {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Estilo de links */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+

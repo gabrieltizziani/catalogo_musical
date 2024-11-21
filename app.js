@@ -1,30 +1,23 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const routes = require('./routes');  // Importando as rotas
+const routes = require('./routes');
 
-// Configurando EJS como motor de templates
+// Configuração do EJS
 app.set('view engine', 'ejs');
-app.set('views', './views'); // Define o diretório onde as views estarão
+app.set('views', './views');
 
-
-
-// Middlewares
-app.use(bodyParser.json());  // Para ler dados JSON no corpo da requisição
-
-// Usando as rotas
-app.use(routes);
-
+// Middleware para arquivos estáticos
 app.use(express.static('public'));
 
-// Rota inicial
-app.get('/', (req, res) => {
-    res.render('index'); // Renderiza a página inicial
-});
-
+// Middlewares para leitura do corpo da requisição
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Definindo a porta
+// Uso de rotas centralizadas
+app.use(routes);
+
+// Inicialização do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
