@@ -3,16 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Gêneros</title>
     <link rel="stylesheet" href="/style.css">
-    <title>Cadastrar Gênero</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <h1>Cadastrar Gênero</h1>
-    <form action="/cadastrar/genero" method="POST">
-        <label for="nome">Nome do Gênero:</label>
-        <input type="text" id="nome" name="nome" required>
+    <h1>Catálogo Musical - Gêneros</h1>
 
-        <button type="submit">Cadastrar Gênero</button>
-    </form>
+    <!-- Formulário de Cadastro/Atualização -->
+    <section>
+        <h2>Cadastrar/Editar Gênero</h2>
+        <form id="formGenero">
+            <input type="hidden" id="generoId">
+        
+            <label for="nomeGenero">Nome do Gênero:</label>
+            <input type="text" id="nomeGenero" placeholder="Nome do Gênero" required>
+        
+            <button type="submit">Salvar</button>
+        </form>
+    </section>
+
+    <!-- Lista de Gêneros -->
+    <section>
+        <h2>Lista de Gêneros</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaGeneros"> <!-- Este tbody será preenchido com os gêneros -->
+                <!-- Conteúdo dinâmico será inserido aqui -->
+            </tbody>
+        </table>
+    </section>
+
+    <script>
+        // Função para carregar gêneros
+        async function carregarGeneros() {
+            try {
+                const response = await axios.get('/api/generos'); // Rota para buscar gêneros
+                const generos = response.data;
+    
+                // Renderiza a lista de gêneros na tabela
+                const lista = document.getElementById('listaGeneros');
+                lista.innerHTML = generos.map(genero => `
+                    <tr>
+                        <td>${genero.id}</td>
+                        <td>${genero.nome}</td>
+                        <td>
+                            <button onclick="editarGenero(${genero.id})">Editar</button>
+                            <button onclick="excluirGenero(${genero.id})">Excluir</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar gêneros:', error);
+            }
+        }
+    
+        // Função para salvar gênero
+        document.getElementById('formGenero').addEventListener('submit', async (e) => {
+            e.preventDefault();
+    
+            const id = document.getElementById('generoId').value;
+            const nome = document.getElementById('nomeGenero').value;
+    
+            try {
+                if (id) {
+                    // Atualiza gênero
+                    await axios.put(`/api/generos/${id}`, { nome });
+                } else {
+                    // Cria novo gênero
+                    await axios.post('/api/generos', { nome });
+                }
+    
+                carregarGeneros();
+                document.getElementById('formGenero').reset();
+            } catch (error) {
+                console.error('Erro ao salvar gênero:', error);
+            }
+        });
+    
+        // Função para editar gênero
+        async function editarGenero(id) {
+            try {
+                const response = await axios.get(`/api/generos/${id}`);
+                const genero = response.data;
+    
+                // Preenche o formulário
+                document.getElementById('generoId').value = genero.id;
+                document.getElementById('nomeGenero').value = genero.nome;
+            } catch (error) {
+                console.error('Erro ao carregar gênero:', error);
+            }
+        }
+    
+        // Função para excluir gênero
+        async function excluirGenero(id) {
+            try {
+                await axios.delete(`/api/generos/${id}`);
+                carregarGeneros();
+            } catch (error) {
+                console.error('Erro ao excluir gênero:', error);
+            }
+        }
+    
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarGeneros(); // Carrega gêneros ao carregar a página
+        });
+    </script>
+    
 </body>
 </html>

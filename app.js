@@ -1,11 +1,23 @@
 const express = require('express');
-const app = express();
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const routes = require('./routes');
 
 // Configuração do EJS
+const app = express();
 app.set('view engine', 'ejs');
 app.set('views', './views');
+
+// Configuração do Multer para upload de arquivos
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/'); // Caminho onde as imagens serão armazenadas
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Nome único para o arquivo
+    }
+});
+const upload = multer({ storage: storage });
 
 // Middleware para arquivos estáticos
 app.use(express.static('public'));

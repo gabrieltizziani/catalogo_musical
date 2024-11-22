@@ -24,19 +24,17 @@ async cadastrarDisco(req, res) {
     
         // Cria e associa faixas ao disco, se fornecidas
         if (faixas && faixas.length > 0) {
-            for (const faixa of faixas) {
-                if (!faixa.titulo || !faixa.duracao) {
-                    return res.status(400).json({
-                        error: 'Erro ao cadastrar disco',
-                        message: 'Cada faixa deve conter um título e duração'
+            const faixaArray = faixas.split('\n'); // Cada linha separada
+            for (const faixa of faixaArray) {
+                const match = faixa.match(/faixa (\d+) - ([0-9:]+)/i);
+                if (match) {
+                    await Faixa.create({
+                        titulo: `Faixa ${match[1]}`, // Exemplo: Faixa 1
+                        duracao: match[2],           // Exemplo: 3:00
+                        numeroFaixa: match[1],       // Número da faixa
+                        discoId: novoDisco.id
                     });
                 }
-                await Faixa.create({
-                    titulo: faixa.titulo,
-                    duracao: faixa.duracao,
-                    numeroFaixa: faixa.numeroFaixa,
-                    discoId: novoDisco.id
-                });
             }
         }
     
@@ -172,6 +170,16 @@ async cadastrarDisco(req, res) {
             res.status(200).json(disco);
         } catch (error) {
             res.status(500).json({ error: 'Erro ao buscar disco', message: error.message });
+        }
+    },
+    async renderCadastrarDisco(req, res) {
+        try {
+            const artistas = await Artista.findAll();
+            const generos = await Genero.findAll();
+    
+            res.render('cadastrar-disco', { artistas, generos });
+        } catch (error) {
+            res.status(500).send('Erro ao carregar dados: ' + error.message);
         }
     },
 };

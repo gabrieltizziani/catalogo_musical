@@ -3,60 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Discos</title>
     <link rel="stylesheet" href="/style.css">
-    <title>Cadastrar Disco</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <h1>Cadastrar Disco</h1>
-    <form action="/cadastrar/disco" method="POST">
-        <label for="titulo">Título do Disco:</label>
-        <input type="text" id="titulo" name="titulo" required>
+    <h1>Gerenciamento de Discos</h1>
 
-        <label for="anoLancamento">Ano de Lançamento:</label>
-        <input type="number" id="anoLancamento" name="anoLancamento" required>
+    <!-- Formulário de Cadastro/Atualização -->
+    <section>
+        <h2>Cadastrar/Editar Disco</h2>
+        <form action="/discos" method="POST" enctype="multipart/form-data">
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo" required>
+        
+            <label for="anoLancamento">Ano de Lançamento:</label>
+            <input type="number" id="anoLancamento" name="anoLancamento" required>
+        
+            <label for="capa">Capa do Disco:</label>
+            <input type="file" id="capa" name="capa" accept="image/*">
+        
+            <label for="artistaIds">Artistas:</label>
+            <select id="artistaIds" name="artistaIds" multiple>
+                <% artistas.forEach(artista => { %>
+                    <option value="<%= artista.id %>"><%= artista.nomeArtista %></option>
+                <% }); %>
+            </select>
+        
+            <label for="generoIds">Gêneros:</label>
+            <select id="generoIds" name="generoIds" multiple>
+                <% generos.forEach(genero => { %>
+                    <option value="<%= genero.id %>"><%= genero.nome %></option>
+                <% }); %>
+            </select>
+        
+            <label for="faixas">Faixas:</label>
+            <textarea id="faixas" name="faixas" rows="5" placeholder="Digite as faixas no formato: faixa 1 - 3:00"></textarea>
+        
+            <button type="submit">Cadastrar Disco</button>
+        </form>        
+        
+    </section>
 
-        <label for="capa">Capa (URL):</label>
-        <input type="text" id="capa" name="capa" required>
-
-        <label for="faixas">Faixas:</label>
-        <div id="faixas">
-            <div class="faixa">
-                <input type="text" name="faixas[0][titulo]" placeholder="Título da Faixa" required>
-                <input type="text" name="faixas[0][duracao]" placeholder="Duração da Faixa" required>
-                <input type="number" name="faixas[0][numeroFaixa]" placeholder="Número da Faixa" required>
-            </div>
-        </div>
-        <button type="button" id="adicionarFaixa">Adicionar Faixa</button>
-
-        <label for="generoIds">Gêneros:</label>
-        <select name="generoIds[]" id="generoIds" multiple>
-            <% generos.forEach(genero => { %>
-                <option value="<%= genero.id %>"><%= genero.nome %></option>
-            <% }) %>
-        </select>
-
-        <label for="artistaIds">Artistas:</label>
-        <select name="artistaIds[]" id="artistaIds" multiple>
-            <% artistas.forEach(artista => { %>
-                <option value="<%= artista.id %>"><%= artista.nomeArtista %></option>
-            <% }) %>
-        </select>
-
-        <button type="submit">Cadastrar Disco</button>
-    </form>
+    <!-- Lista de Discos -->
+    <section>
+        <h2>Lista de Discos</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Ano</th>
+                    <th>Capa</th>
+                    <th>Artistas</th>
+                    <th>Gêneros</th>
+                    <th>Faixas</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaDiscos">
+                <!-- Conteúdo dinâmico será inserido aqui -->
+            </tbody>
+        </table>
+    </section>
 
     <script>
-        let faixaCount = 1;
-        document.getElementById('adicionarFaixa').addEventListener('click', () => {
-            const faixaDiv = document.createElement('div');
-            faixaDiv.classList.add('faixa');
-            faixaDiv.innerHTML = `
-                <input type="text" name="faixas[${faixaCount}][titulo]" placeholder="Título da Faixa" required>
-                <input type="text" name="faixas[${faixaCount}][duracao]" placeholder="Duração da Faixa" required>
-                <input type="number" name="faixas[${faixaCount}][numeroFaixa]" placeholder="Número da Faixa" required>
+        // Carregar artistas
+        async function carregarArtistas() {
+            try {
+                const response = await axios.get('/api/artistas');
+                const artistas = response.data;
+                const select = document.getElementById('artistaIds');
+                artistas.forEach(artista => {
+                    const option = document.createElement('option');
+                    option.value = artista.id;
+                    option.textContent = artista.nomeArtista;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar artistas:', error);
+            }
+        }
+
+        // Carregar gêneros
+        async function carregarGeneros() {
+            try {
+                const response = await axios.get('/api/generos');
+                const generos = response.data;
+                const select = document.getElementById('generoIds');
+                generos.forEach(genero => {
+                    const option = document.createElement('option');
+                    option.value = genero.id;
+                    option.textContent = genero.nome;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar gêneros:', error);
+            }
+        }
+
+        // Carregar discos
+// Carregar discos
+async function carregarDiscos() {
+    try {
+        const response = await axios.get('/api/discos');
+        const discos = response.data;
+        const lista = document.getElementById('listaDiscos');
+        lista.innerHTML = discos.map(disco => {
+            const artistas = Array.isArray(disco.artistas) ? disco.artistas.map(artista => artista.nomeArtista).join(', ') : 'Sem Artistas';
+            const generos = Array.isArray(disco.Generos) ? disco.Generos.map(genero => genero.nome).join(', ') : 'Sem Gêneros';
+            const faixas = Array.isArray(disco.faixas) ? disco.faixas.map(faixa => `${faixa.numeroFaixa}. ${faixa.titulo} (${faixa.duracao})`).join('<br>') : 'Sem Faixas';
+            const capa = disco.capa ? `<img src="/uploads/${disco.capa}" alt="Capa" width="50">` : 'Sem Capa';
+            
+            return `
+                <tr>
+                    <td>${disco.id}</td>
+                    <td>${disco.titulo}</td>
+                    <td>${disco.anoLancamento}</td>
+                    <td>${capa}</td>
+                    <td>${artistas}</td>
+                    <td>${generos}</td>
+                    <td>${faixas}</td>
+                    <td>
+                        <button onclick="editarDisco(${disco.id})">Editar</button>
+                        <button onclick="excluirDisco(${disco.id})">Excluir</button>
+                    </td>
+                </tr>
             `;
-            document.getElementById('faixas').appendChild(faixaDiv);
-            faixaCount++;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar discos:', error);
+    }
+}
+
+        // Salvar disco
+        document.getElementById('formDisco').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = document.getElementById('formDisco');
+            const formData = new FormData(form);
+            const id = document.getElementById('discoId').value;
+
+            try {
+                if (id) {
+                    await axios.put(`/api/discos/${id}`, formData);
+                } else {
+                    await axios.post('/api/discos', formData);
+                }
+                form.reset();
+                carregarDiscos();
+            } catch (error) {
+                console.error('Erro ao salvar disco:', error);
+            }
+        });
+
+        // Editar disco
+        async function editarDisco(id) {
+            try {
+                const response = await axios.get(`/api/discos/${id}`);
+                const disco = response.data;
+                document.getElementById('discoId').value = disco.id;
+                document.getElementById('titulo').value = disco.titulo;
+                document.getElementById('anoLancamento').value = disco.anoLancamento;
+                // Campos múltiplos
+                Array.from(document.getElementById('artistaIds').options).forEach(option => {
+                    option.selected = disco.artistas.some(a => a.id == option.value);
+                });
+                Array.from(document.getElementById('generoIds').options).forEach(option => {
+                    option.selected = disco.generos.some(g => g.id == option.value);
+                });
+                document.getElementById('faixas').value = disco.faixas.map(f => `faixa ${f.numeroFaixa} - ${f.duracao}`).join('\n');
+            } catch (error) {
+                console.error('Erro ao carregar disco:', error);
+            }
+        }
+
+        // Excluir disco
+        async function excluirDisco(id) {
+            try {
+                await axios.delete(`/api/discos/${id}`);
+                carregarDiscos();
+            } catch (error) {
+                console.error('Erro ao excluir disco:', error);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarArtistas();
+            carregarGeneros();
+            carregarDiscos();
         });
     </script>
 </body>
