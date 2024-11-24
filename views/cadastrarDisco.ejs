@@ -104,31 +104,81 @@
             }
         }
 
-        // Carregar discos
         async function carregarDiscos() {
             try {
                 const response = await axios.get('/api/discos');
                 const tabela = document.getElementById('listaDiscos');
-                tabela.innerHTML = response.data.map(disco => `
-                    <tr>
-                        <td>${disco.id}</td>
-                        <td>${disco.titulo}</td>
-                        <td>${disco.anoLancamento}</td>
-                        <td><img src="${axios.defaults.baseURL}${disco.capa}" alt="${disco.titulo}" width="50"></td>
-                        <td>${disco.artistas?.map(artista => artista.nomeArtista).join(', ') || 'N/A'}</td>
-                        <td>${disco.generos?.map(genero => genero.nome).join(', ') || 'N/A'}</td>
-                        <td>${disco.faixas?.map(faixa => `${faixa.numeroFaixa || "N/A"}: ${faixa.titulo || "N/A"} (${faixa.duracao || "N/A"})`).join('<br>') || 'N/A'}</td>
-                        <td>
-                            <button onclick="editarDisco(${disco.id})">Editar</button>
-                            <button onclick="excluirDisco(${disco.id})">Excluir</button>
-                        </td>
-                    </tr>
-                `).join('');
+                tabela.innerHTML = ''; // Limpa a tabela
+
+                response.data.forEach(disco => {
+                    const row = document.createElement('tr');
+
+                    // ID
+                    const idCell = document.createElement('td');
+                    idCell.textContent = disco.id;
+                    row.appendChild(idCell);
+
+                    // Título
+                    const tituloCell = document.createElement('td');
+                    tituloCell.textContent = disco.titulo;
+                    row.appendChild(tituloCell);
+
+                    // Ano
+                    const anoCell = document.createElement('td');
+                    anoCell.textContent = disco.anoLancamento;
+                    row.appendChild(anoCell);
+
+                    // Capa
+                    const capaCell = document.createElement('td');
+                    if (disco.capa) {
+                        const img = document.createElement('img');
+                        img.src = `/uploads/${disco.capa}`;
+                        img.alt = `Capa do disco ${disco.titulo}`;
+                        img.width = 50;
+                        capaCell.appendChild(img);
+                    } else {
+                        capaCell.textContent = 'Sem capa';
+                    }
+                    row.appendChild(capaCell);
+
+                    // Artistas
+                    const artistasCell = document.createElement('td');
+                    artistasCell.textContent = disco.artistas.map(a => a.nomeArtista).join(', ');
+                    row.appendChild(artistasCell);
+
+                    // Gêneros
+                    const generosCell = document.createElement('td');
+                    generosCell.textContent = disco.Generos.map(g => g.nome).join(', ');
+                    row.appendChild(generosCell);
+
+                    // Faixas
+                    const faixasCell = document.createElement('td');
+                    faixasCell.textContent = disco.faixas.map(f => `${f.numeroFaixa}. ${f.titulo}`).join('\n');
+                    row.appendChild(faixasCell);
+
+                    // Ações
+                    const acoesCell = document.createElement('td');
+
+                    // Botão de Editar
+                    const editarBtn = document.createElement('button');
+                    editarBtn.textContent = 'Editar';
+                    editarBtn.addEventListener('click', () => editarDisco(disco.id));
+                    acoesCell.appendChild(editarBtn);
+
+                    // Botão de Excluir
+                    const excluirBtn = document.createElement('button');
+                    excluirBtn.textContent = 'Excluir';
+                    excluirBtn.addEventListener('click', () => excluirDisco(disco.id));
+                    acoesCell.appendChild(excluirBtn);
+
+                    row.appendChild(acoesCell);
+
+                    tabela.appendChild(row);
+                });
             } catch (error) {
                 console.error('Erro ao carregar discos:', error);
             }
         }
-
         // Editar disco
         async function editarDisco(id) {
             try {

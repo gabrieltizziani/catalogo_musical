@@ -26,6 +26,8 @@ const upload = multer({
 });
 app.use(upload.single('capa')); // Middleware para receber arquivos no campo "capa"
 
+app.use('/uploads', express.static('uploads'));
+
 // Uso de rotas centralizadas
 app.use(routes);
 
